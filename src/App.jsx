@@ -4,93 +4,93 @@ import './App.css'
 
 function App() {
 
-  const [taskList, setTaskList] = useState(tasks)
-  const [searchText, setSearchText] = useState("")
-  const [statusFilter, setStatusFilter] = useState("all")
-  const [priorityFilter, setPriorityFilter] = useState("all")
-  const [newTitle, setNewTitle] = useState("")
-  const [newDescription, setNewDescription] = useState("")
-  const [newStatus, setNewStatus] = useState("open")
-  const [newPriority, setNewPriority] = useState("medium")
-  const [editingTaskId, setEditingTaskId] = useState(null)
-  const [editedTitle, setEditedTitle] = useState("")
-  const [editedDescription, setEditedDescription] = useState("")
-  const [editedStatus, setEditedStatus] = useState("open")
-  const [editedPriority, setEditedPriority] = useState("medium")
+  const [allTasks, setAllTasks] = useState(tasks)
+  const [searchQueryText, setSearchQueryText] = useState("")
+  const [selectedStatusFilter, setSelectedStatusFilter] = useState("all")
+  const [selectedPriorityFilter, setSelectedPriorityFilter] = useState("all")
+  const [newTaskTitle, setNewTaskTitle] = useState("")
+  const [newTaskDescription, setNewTaskDescription] = useState("")
+  const [newTaskStatus, setNewTaskStatus] = useState("open")
+  const [newTaskPriority, setNewTaskPriority] = useState("medium")
+  const [currentlyEditingTaskId, setCurrentlyEditingTaskId] = useState(null)
+  const [editedTaskTitle, setEditedTaskTitle] = useState("")
+  const [editedTaskDescription, setEditedTaskDescription] = useState("")
+  const [editedTaskStatus, setEditedTaskStatus] = useState("open")
+  const [editedTaskPriority, setEditedTaskPriority] = useState("medium")
 
-  function handleDelete(taskId) {
-    const updatedTasks = taskList.filter((task) => task.id !== taskId)
-    setTaskList(updatedTasks)
+  function handleDeleteTask(taskId) {
+    const remainingTasks = allTasks.filter((task) => task.id !== taskId)
+    setAllTasks(remainingTasks)
   }
 
-  function handleEdit(task) {
-    setEditingTaskId(task.id)
-    setEditedTitle(task.title)
-    setEditedDescription(task.description)
-    setEditedStatus(task.status)
-    setEditedPriority(task.priority)
+  function handleStartEditingTask(task) {
+    setCurrentlyEditingTaskId(task.id)
+    setEditedTaskTitle(task.title)
+    setEditedTaskDescription(task.description)
+    setEditedTaskStatus(task.status)
+    setEditedTaskPriority(task.priority)
   }
 
-  function handleSaveEdit(taskId) {
-    const updatedTasks = taskList.map((task) => {
+  function handleSaveEditedTask(taskId) {
+    const updatedTaskList = allTasks.map((task) => {
       if (task.id === taskId) {
         return {
           ...task,
-          title: editedTitle,
-          description: editedDescription,
-          status: editedStatus,
-          priority: editedPriority
+          title: editedTaskTitle,
+          description: editedTaskDescription,
+          status: editedTaskStatus,
+          priority: editedTaskPriority
         }
       }
       return task
     })
-    setTaskList(updatedTasks)
-    setEditingTaskId(null)
+    setAllTasks(updatedTaskList)
+    setCurrentlyEditingTaskId(null)
   }
 
-  function handleCancelEdit() {
-    setEditingTaskId(null)
+  function handleCancelEditingTask() {
+    setCurrentlyEditingTaskId(null)
   }
 
-  function handleAddTask(event) {
+  function handleAddNewTask(event) {
     event.preventDefault()
-    if (newTitle.trim() === "") {
+    if (newTaskTitle.trim() === "") {
       alert("Der Titel ist erforderlich")
       return
     }
-    const newTask = {
+    const newTaskObject = {
       id: Date.now().toString(),
-      title: newTitle,
-      description: newDescription,
-      status: newStatus,
-      priority: newPriority,
+      title: newTaskTitle,
+      description: newTaskDescription,
+      status: newTaskStatus,
+      priority: newTaskPriority,
       createdAt: new Date().toISOString()
     }
-    setTaskList([...taskList, newTask])
-    setNewTitle("")
-    setNewDescription("")
-    setNewStatus("open")
-    setNewPriority("medium")
+    setAllTasks([...allTasks, newTaskObject])
+    setNewTaskTitle("")
+    setNewTaskDescription("")
+    setNewTaskStatus("open")
+    setNewTaskPriority("medium")
   }
 
-  const statusLabels = {
+  const statusDisplayLabels = {
     open: "Offen",
     in_progress: "In Bearbeitung",
     done: "Erledigt"
   }
-  const priorityLabels = {
+  const priorityDisplayLabels = {
     low: "Niedrig",
     medium: "Mittel",
     high: "Hoch"
   }
 
-  const filteredTasks = taskList.filter((task) => {
-    const query = searchText.toLowerCase()
-    const titleMatches = task.title.toLowerCase().includes(query)
-    const descriptionMatches = task.description.toLowerCase().includes(query)
-    const statusMatches = statusFilter === "all" || task.status === statusFilter
-    const priorityMatches = priorityFilter === "all" || task.priority === priorityFilter
-    return (titleMatches || descriptionMatches) && statusMatches && priorityMatches
+  const filteredTaskList = allTasks.filter((task) => {
+    const lowercaseSearchQuery = searchQueryText.toLowerCase()
+    const titleMatchesSearch = task.title.toLowerCase().includes(lowercaseSearchQuery)
+    const descriptionMatchesSearch = task.description.toLowerCase().includes(lowercaseSearchQuery)
+    const matchesSelectedStatus = selectedStatusFilter === "all" || task.status === selectedStatusFilter
+    const matchesSelectedPriority = selectedPriorityFilter === "all" || task.priority === selectedPriorityFilter
+    return (titleMatchesSearch || descriptionMatchesSearch) && matchesSelectedStatus && matchesSelectedPriority
   })
 
   return (
@@ -101,16 +101,16 @@ function App() {
         <input
           type="text"
           placeholder="Tasks durchsuchen..."
-          value={searchText}
-          onChange={(e) => setSearchText(e.target.value)}
+          value={searchQueryText}
+          onChange={(e) => setSearchQueryText(e.target.value)}
         />
-        <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
+        <select value={selectedStatusFilter} onChange={(e) => setSelectedStatusFilter(e.target.value)}>
           <option value="all">Alle Status</option>
           <option value="open">Offen</option>
           <option value="in_progress">In Bearbeitung</option>
           <option value="done">Erledigt</option>
         </select>
-        <select value={priorityFilter} onChange={(e) => setPriorityFilter(e.target.value)}>
+        <select value={selectedPriorityFilter} onChange={(e) => setSelectedPriorityFilter(e.target.value)}>
           <option value="all">Alle Prioritäten</option>
           <option value="low">Niedrig</option>
           <option value="medium">Mittel</option>
@@ -118,25 +118,25 @@ function App() {
         </select>
       </div>
 
-      <form className="task-form" onSubmit={handleAddTask}>
+      <form className="task-form" onSubmit={handleAddNewTask}>
         <input
           type="text"
           placeholder="Task Titel"
-          value={newTitle}
-          onChange={(e) => setNewTitle(e.target.value)}
+          value={newTaskTitle}
+          onChange={(e) => setNewTaskTitle(e.target.value)}
         />
         <input
           type="text"
           placeholder="Task Beschreibung"
-          value={newDescription}
-          onChange={(e) => setNewDescription(e.target.value)}
+          value={newTaskDescription}
+          onChange={(e) => setNewTaskDescription(e.target.value)}
         />
-        <select value={newStatus} onChange={(e) => setNewStatus(e.target.value)}>
+        <select value={newTaskStatus} onChange={(e) => setNewTaskStatus(e.target.value)}>
           <option value="open">Offen</option>
           <option value="in_progress">In Bearbeitung</option>
           <option value="done">Erledigt</option>
         </select>
-        <select value={newPriority} onChange={(e) => setNewPriority(e.target.value)}>
+        <select value={newTaskPriority} onChange={(e) => setNewTaskPriority(e.target.value)}>
           <option value="low">Niedrig</option>
           <option value="medium">Mittel</option>
           <option value="high">Hoch</option>
@@ -145,25 +145,25 @@ function App() {
       </form>
 
       <ul className="task-list">
-        {filteredTasks.map((task) => (
+        {filteredTaskList.map((task) => (
           <li key={task.id} className="task-card">
-            {editingTaskId === task.id ? (
+            {currentlyEditingTaskId === task.id ? (
               <div className="edit-form">
-                <input value={editedTitle} onChange={(e) => setEditedTitle(e.target.value)} />
-                <input value={editedDescription} onChange={(e) => setEditedDescription(e.target.value)} />
-                <select value={editedStatus} onChange={(e) => setEditedStatus(e.target.value)}>
+                <input value={editedTaskTitle} onChange={(e) => setEditedTaskTitle(e.target.value)} />
+                <input value={editedTaskDescription} onChange={(e) => setEditedTaskDescription(e.target.value)} />
+                <select value={editedTaskStatus} onChange={(e) => setEditedTaskStatus(e.target.value)}>
                   <option value="open">Offen</option>
                   <option value="in_progress">In Bearbeitung</option>
                   <option value="done">Erledigt</option>
                 </select>
-                <select value={editedPriority} onChange={(e) => setEditedPriority(e.target.value)}>
+                <select value={editedTaskPriority} onChange={(e) => setEditedTaskPriority(e.target.value)}>
                   <option value="low">Niedrig</option>
                   <option value="medium">Mittel</option>
                   <option value="high">Hoch</option>
                 </select>
                 <div className="edit-form-actions">
-                  <button className="save-btn" onClick={() => handleSaveEdit(task.id)}>Speichern</button>
-                  <button className="cancel-btn" onClick={handleCancelEdit}>Abbrechen</button>
+                  <button className="save-btn" onClick={() => handleSaveEditedTask(task.id)}>Speichern</button>
+                  <button className="cancel-btn" onClick={handleCancelEditingTask}>Abbrechen</button>
                 </div>
               </div>
             ) : (
@@ -173,12 +173,12 @@ function App() {
                   <div className="task-description">{task.description}</div>
                 )}
                 <div className="task-tags">
-                  <span className={`badge status-${task.status}`}>{statusLabels[task.status]}</span>
-                  <span className={`badge priority-${task.priority}`}>{priorityLabels[task.priority]}</span>
+                  <span className={`badge status-${task.status}`}>{statusDisplayLabels[task.status]}</span>
+                  <span className={`badge priority-${task.priority}`}>{priorityDisplayLabels[task.priority]}</span>
                 </div>
                 <div className="task-actions">
-                  <button onClick={() => handleEdit(task)}>Bearbeiten</button>
-                  <button className="delete-btn" onClick={() => handleDelete(task.id)}>Löschen</button>
+                  <button onClick={() => handleStartEditingTask(task)}>Bearbeiten</button>
+                  <button className="delete-btn" onClick={() => handleDeleteTask(task.id)}>Löschen</button>
                 </div>
               </>
             )}
